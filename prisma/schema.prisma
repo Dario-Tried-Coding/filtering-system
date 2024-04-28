@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SIZE {
+  S
+  M
+  L
+}
+
+enum COLOR {
+  WHITE
+  BEIGE
+  BLUE
+  GREEN
+  PURPLE
+}
+
+model Product {
+  id String @id @default(cuid())
+  name String
+  imageId String
+  size SIZE
+  color COLOR
+  price Float
+}
