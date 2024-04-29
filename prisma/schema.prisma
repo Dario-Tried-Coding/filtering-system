@@ -21,10 +21,14 @@ enum COLOR {
   PURPLE
 }
 
+enum CLOTHING_TYPE {
+  SHIRT
+}
+
 model Product {
   id String @id @default(cuid())
   name String
-  imageId String
+  type CLOTHING_TYPE
   size SIZE
   color COLOR
   price Float

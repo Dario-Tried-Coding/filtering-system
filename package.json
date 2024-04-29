@@ -6,13 +6,20 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed": "tsx ./src/seed.ts",
+    "test": "tsx ./src/test.ts"
   },
   "dependencies": {
+    "@langchain/openai": "^0.0.28",
     "@prisma/client": "^5.13.0",
+    "@supabase/supabase-js": "^2.42.7",
+    "dotenv": "^16.4.5",
+    "nanoid": "^5.0.7",
     "next": "14.2.3",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "tsx": "^4.7.3"
   },
   "devDependencies": {
     "@types/node": "^20",
