@@ -1,11 +1,6 @@
-import { CLOTHING_TYPE, CLOTHING_TYPES, COLORS, PRICES, SIZES } from '@/config'
-import { ProdVectorCreationPayload } from '@/types'
+import { CLOTHING_TYPES, COLORS, PRICES, SIZES } from '@/config'
 import { PrismaClient, Product } from '@prisma/client'
-import { createClient } from '@supabase/supabase-js'
-import * as dotenv from 'dotenv'
 import { nanoid } from 'nanoid'
-
-dotenv.config()
 
 const db = new PrismaClient()
 
@@ -19,7 +14,7 @@ async function seed() {
   try {
     await db.product.deleteMany()
 
-    console.log('[INFO]: db reset completed...')
+    console.log('[INFO]: db reset completed!')
 
     for (let typeIdx = 0; typeIdx < CLOTHING_TYPES.length; typeIdx++) {
       for (let colorIdx = 0; colorIdx < COLORS.length; colorIdx++) {
@@ -41,9 +36,9 @@ async function seed() {
     }
 
     await db.product.createMany({ data: products })
-    console.log('[INFO]: "Product" table seeded successfully...')
-    
-    console.log('[SUCCESS]: Seeding process completed successfully...')
+    console.log('[INFO]: "Product" table seeded successfully!')
+
+    console.log('[SUCCESS]: Seeding process completed successfully!')
   } catch (error) {
     console.log('[ERROR]:', (error as Error).message)
   }
