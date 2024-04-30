@@ -9,8 +9,6 @@ dotenv.config()
 
 const db = new PrismaClient()
 
-const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!)
-
 const generateRandomPrice = () => PRICES[Math.floor(Math.random() * PRICES.length)]
 
 async function seed() {
@@ -20,8 +18,6 @@ async function seed() {
 
   try {
     await db.product.deleteMany()
-    const { error: deletionError } = await supabase.from('product_vector').delete().neq('id', 0)
-    if (deletionError) throw new Error(deletionError.message)
 
     console.log('[INFO]: db reset completed...')
 
@@ -46,21 +42,7 @@ async function seed() {
 
     await db.product.createMany({ data: products })
     console.log('[INFO]: "Product" table seeded successfully...')
-
-    const CLOTHING_TYPE_MAP = new Map<CLOTHING_TYPE, number>([['SHIRT', 0]])
-    const COLOR_MAP = new Map(COLORS.map((color, idx) => [color, idx]))
-    const SIZE_MAP = new Map(SIZES.map((size, idx) => [size, idx]))
-
-    const { error: creationError } = await supabase.from('product_vector').insert<ProdVectorCreationPayload[]>(
-      products.map((p) => ({
-        id: p.id,
-        metadata: p,
-        embedding: [CLOTHING_TYPE_MAP.get(p.type)!, COLOR_MAP.get(p.color)!, SIZE_MAP.get(p.size)!, generateRandomPrice()],
-      }))
-    )
-    if (creationError) throw new Error(creationError.message)
     
-    console.log('[INFO]: "Product_Vector" table seeded successfully...')
     console.log('[SUCCESS]: Seeding process completed successfully...')
   } catch (error) {
     console.log('[ERROR]:', (error as Error).message)
