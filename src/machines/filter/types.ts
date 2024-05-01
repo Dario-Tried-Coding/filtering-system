@@ -18,8 +18,12 @@ export type FilterFieldValue<T extends FilterFields> = T extends 'type'
         ? [number, number]
         : never
 
-export type FilterChangeEvent<T extends FilterFields> = {
-  type: 'filter.change'
+type FilterChangePayload<T extends FilterFields> = {
   field: T
   value: FilterFieldValue<T>
+}
+export type FilterChangePayloads = FilterChangePayload<'type'> | FilterChangePayload<'color'> | FilterChangePayload<'size'> | FilterChangePayload<'price'>
+
+export type FilterChangeEvent<T extends FilterFields> = FilterChangePayload<T> & {
+  type: 'filter.change'
 }
