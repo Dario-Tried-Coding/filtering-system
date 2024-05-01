@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 import { ChevronDown } from 'lucide-react'
 
 export default function Home() {
-  const {query: {error}, machine: [state, send]} = useFilter()
+  const {query: {error}, machine: [state, send], debouncedSend} = useFilter()
 
   return (
     <main className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>

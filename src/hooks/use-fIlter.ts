@@ -8,8 +8,10 @@ import { useMachine } from '@xstate/react'
 import axios from 'axios'
 import { useEffect } from 'react'
 import { createBrowserInspector } from '@statelyai/inspect'
+import { useDebouncedCallback } from '@mantine/hooks'
+import { FilterMachine_Events } from '@/machines/filter/events'
 
-const { inspect } = createBrowserInspector()
+// const { inspect } = createBrowserInspector()
 
 export function useFilter() {
   const machine = useMachine(
@@ -25,7 +27,6 @@ export function useFilter() {
         size: SIZES.map((size) => size),
         price: [PRICES[0], PRICES[PRICES.length - 1]],
       },
-      inspect,
     }
   )
 
@@ -42,5 +43,7 @@ export function useFilter() {
   useEffect(() => machine[1]({ type: 'loading.success' }), [query.dataUpdatedAt])
   useEffect(() => machine[1]({ type: 'loading.error' }), [query.errorUpdatedAt])
 
-  return { query, machine }
+  const debouncedSend = useDebouncedCallback((event:FilterMachine_Events) => machine[1](event), 500)
+
+  return { query, machine, debouncedSend }
 }

@@ -40,7 +40,7 @@ export const filterMachine = setup({
   },
   actors: {} as Actors,
 }).createMachine({
-  /** @xstate-layout N4IgpgJg5mDOIC5QDMCWAbALmATgWQEMBjAC1QDswBidAewIgqgDocxMcBPAbQAYBdRKAAOtWKkypa5ISAAeiAEwBmAGzMAjAHYArIo3LeB1Rp0BOLQBoQnRAFpVvZgBYzb51qNnlanQF8-azQsXEJSCmpg7BxmUgJyGD5BJBBRcUlpWQUEOw1eRWZ8rRNFMwAOZwMtN2tbHK1lZi1FVR1eXm8NVWUdboCgjGiwskpmOgYmAAUcWggAVyJMWBp6RgTmWAWiOFgk2TSJKRkU7NzeMuYWjTNHXhNTHtVaxAMNZlVPBsVS5zLFXv8gRAUVCxBGYDGqymM3mi2W4zWLFwMxwexSBwyx1A2UUzgKijuzm6GjKeVUfysNheyjeH14Xx+f16ygCQPIszgshB+DBEX2YkOmRO9lM6iuN3a9x0j2eOQJOiaLTavQ0zl+Zmc-WBg1B4VGsBItAA7tNZgslvz0kcsvY3C5XB4PLcNKVZQSzMwAaozEYSeTvYotdzhhENoajQBRHAoy2CrHyJTS968X5lXqqb6KZplN0dT2tb2+sr+syBoHB3mjBHQs1w2OYm0IDOe4u6bQ9ZxqPGy1Tqaqd3FaImVP4aVl+IA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QDMCWAbALmATgWQEMBjAC1QDswBidAewIgqgDocxMcBPAbQAYBdRKAAOtWKkypa5ISAAeiAEwAWRc2XLeADlUBmRQE5FirYoCsAGhCdEAWgCMWgGzMz2xU95OtAdj-KDZQBfIKs0LFxCUgpqcOwcZlICchg+QSQQUXFJaVkFBFtA5gN7Xl0DT3sze3NdKxsCxV4DZkVdZVNnfV5DAx8QsIx4qLJKZjoGJgAFHFoIAFciTFgaekYU5lhFojhYNNksiSkZDPyHbVanewreL3sq3TMnesR7XXtmJx9eH31DDvMTjMAxAcUixFGYHGa2mswWSxWE3WLFwsxw+wyhxyJ1A+RUaiaTmUTneWlK3kUPheCDeHy+Pz+gVMT10ILB+AhMWYEDAACNaPNyEQmAAlMBIqhyWCYAjYZgEZDxAAUbl4AEoqOyRlyefzBcKUmKkRiRGIjrlTogvsxdLovk4DGYzPojLbqbZlB8yd8tG52oZ3sEQeQ5nBZFrOZQDmbsXk7FUXB5rp47g8nu72h82h1bYGtFpdD4nGyhuDomNYCRaAB3GZzRbLaPZY5xgoGFoaQI+ZRF241AzUpotJ5PAy8e7OZxGEsRDnlqGVmsAURwaKb5px8iUzs+vA6vqcTmMlJMg+ariBDvHjm8DsUM+GkahSNh9YR69jloQR9czh81V+MxlDtVRqUPZgfECfQe2JT1THsB8y0hbk+QFIVRXFNYPxbL8gOYCdx2UMwKnzIkgPdUoPg6ICex8AsdBUVkQiCIA */
   id: 'filterMachine',
 
   description: 'A state machine to manage the filtering of products',
@@ -49,7 +49,6 @@ export const filterMachine = setup({
 
   states: {
     showProducts: {},
-
     showError: {},
 
     loadingProducts: {
@@ -58,22 +57,27 @@ export const filterMachine = setup({
         'loading.error': 'showError',
       },
     },
+
+    debouncingReload: {
+      after: {
+        "500": {
+          target: "loadingProducts",
+          actions: "reloadProducts"
+        }
+      }
+    }
   },
   on: {
     'loading.retry': {
-      target: '.loadingProducts',
-      actions: 'reloadProducts',
+      target: '.debouncingReload',
     },
 
     'filter.change': {
-      target: '.loadingProducts',
-      actions: [
-        {
-          type: 'updateFilter',
-          params: ({ event: { field, value } }) => ({ field, value }),
-        },
-        'reloadProducts'
-      ],
+      target: ".debouncingReload",
+      actions: [{
+        type: 'updateFilter',
+        params: ({ event: { field, value } }) => ({ field, value }),
+      }],
     },
   },
 })
