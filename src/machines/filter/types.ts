@@ -1,29 +1,25 @@
-import { CLOTHING_TYPE, COLOR, SIZE } from '@/config'
+import { Config } from '@/config'
 
-export interface Filter {
-  type: CLOTHING_TYPE
-  color: COLOR[]
-  size: SIZE[]
+export type Filter = {
+  type: Config['types']
+  colors: Config['colors'][]
+  sizes: Config['sizes'][]
   price: [number, number]
+  sorting: Config['sorting'] | undefined
 }
 
-export type FilterFields = keyof Filter
-export type FilterFieldValue<T extends FilterFields> = T extends 'type'
-  ? CLOTHING_TYPE
-  : T extends 'color'
-    ? COLOR
-    : T extends 'size'
-      ? SIZE
-      : T extends 'price'
-        ? [number, number]
-        : never
+type FilterFields = keyof Filter
+export type FilterValue<T extends FilterFields> = Filter[T] extends string[] ? Filter[T][number] : Filter[T]
 
-type FilterChangePayload<T extends FilterFields> = {
+type FilterChange_Payload<T extends FilterFields> = {
   field: T
-  value: FilterFieldValue<T>
+  value: FilterValue<T>
 }
-export type FilterChangePayloads = FilterChangePayload<'type'> | FilterChangePayload<'color'> | FilterChangePayload<'size'> | FilterChangePayload<'price'>
 
-export type FilterChangeEvent<T extends FilterFields> = FilterChangePayload<T> & {
+type FilterChange_Payloads = {
+  [K in FilterFields]: FilterChange_Payload<K>
+}[FilterFields]
+
+export type FilterChange_Event = FilterChange_Payloads & {
   type: 'filter.change'
 }

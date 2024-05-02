@@ -1,8 +1,8 @@
+import { FilterMachine_Actors as Actors } from '@/machines/filter/actors'
 import { FilterMachine_Context as Context } from '@/machines/filter/context'
 import { FilterMachine_Events as Events } from '@/machines/filter/events'
 import { FilterMachine_Input as Input } from '@/machines/filter/input'
-import { FilterMachine_Actors as Actors } from '@/machines/filter/actors'
-import { FilterChangeEvent, FilterFieldValue, FilterFields } from '@/machines/filter/types'
+import { FilterChange_Event, FilterValue } from '@/machines/filter/types'
 import { assign, setup } from 'xstate'
 
 export const filterMachine = setup({
@@ -13,25 +13,28 @@ export const filterMachine = setup({
   },
   actions: {
     reloadProducts: () => {},
-    updateFilter: assign(({ context: filter }, { field, value }: Omit<FilterChangeEvent<FilterFields>, 'type'>) => {
+    updateFilter: assign(({ context: filter }, { field, value }: Omit<FilterChange_Event, 'type'>) => {
       switch (field) {
         case 'price':
-          return { ...filter, price: value as [number, number] }
+          return { price: value as [number, number] }
 
         case 'type':
-          return { ...filter, type: value as FilterFieldValue<'type'> }
+          return { type: value as FilterValue<'type'> }
+        
+        case 'sorting':
+          return { sorting: value as FilterValue<'sorting'> }
 
-        case 'color':
-          const updatedColor = filter.color.includes(value as FilterFieldValue<'color'>)
-            ? filter.color.filter((c) => c !== value)
-            : [...filter.color, value as FilterFieldValue<'color'>]
-          return { ...filter, color: updatedColor }
+        case 'colors':
+          const updatedColor = filter.colors.includes(value as FilterValue<'colors'>)
+            ? filter.colors.filter((c) => c !== value)
+            : [...filter.colors, value as FilterValue<'colors'>]
+          return { colors: updatedColor }
 
-        case 'size':
-          const updatedSize = filter.size.includes(value as FilterFieldValue<'size'>)
-            ? filter.size.filter((s) => s !== value)
-            : [...filter.size, value as FilterFieldValue<'size'>]
-          return { ...filter, size: updatedSize }
+        case 'sizes':
+          const updatedSize = filter.sizes.includes(value as FilterValue<'sizes'>)
+            ? filter.sizes.filter((s) => s !== value)
+            : [...filter.sizes, value as FilterValue<'sizes'>]
+          return { sizes: updatedSize }
 
         default:
           throw new Error('Invalid field')
@@ -60,12 +63,12 @@ export const filterMachine = setup({
 
     debouncingReload: {
       after: {
-        "500": {
-          target: "loadingProducts",
-          actions: "reloadProducts"
-        }
-      }
-    }
+        '1000': {
+          target: 'loadingProducts',
+          actions: 'reloadProducts',
+        },
+      },
+    },
   },
   on: {
     'loading.retry': {
@@ -73,11 +76,13 @@ export const filterMachine = setup({
     },
 
     'filter.change': {
-      target: ".debouncingReload",
-      actions: [{
-        type: 'updateFilter',
-        params: ({ event: { field, value } }) => ({ field, value }),
-      }],
+      target: '.debouncingReload',
+      actions: [
+        {
+          type: 'updateFilter',
+          params: ({ event: { field, value } }) => ({ field, value }),
+        },
+      ],
     },
   },
 })

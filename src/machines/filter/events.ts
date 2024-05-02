@@ -1,3 +1,3 @@
-import { FilterChangeEvent, FilterFields } from '@/machines/filter/types'
+import { FilterChange_Event } from '@/machines/filter/types'
 
-export type FilterMachine_Events = { type: 'loading.success' } | { type: 'loading.error' } | { type: 'loading.retry' } | FilterChangeEvent<'type'> | FilterChangeEvent<'color'> | FilterChangeEvent<'size'> | FilterChangeEvent<'price'>
+export type FilterMachine_Events = { type: 'loading.success' } | { type: 'loading.error' } | { type: 'loading.retry' } | FilterChange_Event

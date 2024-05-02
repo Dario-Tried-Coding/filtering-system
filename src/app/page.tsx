@@ -7,7 +7,11 @@ import { cn } from '@/lib/utils'
 import { ChevronDown } from 'lucide-react'
 
 export default function Home() {
-  const {query: {error}, machine: [state, send], debouncedSend} = useFilter()
+  const {
+    query: { error },
+    machine: [state, send],
+    debouncedSend,
+  } = useFilter()
 
   return (
     <main className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
@@ -33,7 +37,7 @@ export default function Home() {
       <div>{state.value}</div>
       <pre>{JSON.stringify(state.context, null, 2)}</pre>
       {error && <div className='text-red-500'>Errore: {error.message}</div>}
-      <button onClick={() => send({ type: 'filter.change', field: 'color', value: 'BLUE' })}>click</button>
+      <button onClick={() => send({ type: 'filter.change', field: 'colors', value: 'BLUE' })}>click</button>
     </main>
   )
 }

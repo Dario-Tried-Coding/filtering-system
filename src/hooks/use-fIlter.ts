@@ -1,15 +1,15 @@
 'use client'
 
-import { COLORS, PRICES, SIZES } from '@/config'
 import { filterMachine } from '@/machines/filter/filter.machine'
 import { Product } from '@prisma/client'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMachine } from '@xstate/react'
 import axios from 'axios'
 import { useEffect } from 'react'
-import { createBrowserInspector } from '@statelyai/inspect'
+// import { createBrowserInspector } from '@statelyai/inspect'
 import { useDebouncedCallback } from '@mantine/hooks'
 import { FilterMachine_Events } from '@/machines/filter/events'
+import { config } from '@/config'
 
 // const { inspect } = createBrowserInspector()
 
@@ -22,10 +22,11 @@ export function useFilter() {
     }),
     {
       input: {
-        type: 'SHIRT',
-        color: COLORS.map((color) => color),
-        size: SIZES.map((size) => size),
-        price: [PRICES[0], PRICES[PRICES.length - 1]],
+        type: config.types[0],
+        colors: config.colors.map((c) => c),
+        sizes: config.sizes.map((s) => s),
+        price: [config.prices[0], config.prices[config.prices.length - 1]],
+        sorting: undefined,
       },
     }
   )
@@ -43,7 +44,7 @@ export function useFilter() {
   useEffect(() => machine[1]({ type: 'loading.success' }), [query.dataUpdatedAt])
   useEffect(() => machine[1]({ type: 'loading.error' }), [query.errorUpdatedAt])
 
-  const debouncedSend = useDebouncedCallback((event:FilterMachine_Events) => machine[1](event), 500)
+  const debouncedSend = useDebouncedCallback((event: FilterMachine_Events) => machine[1](event), 500)
 
   return { query, machine, debouncedSend }
 }
