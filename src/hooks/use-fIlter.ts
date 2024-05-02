@@ -25,8 +25,8 @@ export function useFilter() {
         type: config.types[0],
         colors: config.colors.map((c) => c),
         sizes: config.sizes.map((s) => s),
-        price: [config.prices[0], config.prices[config.prices.length - 1]],
-        sorting: undefined,
+        price: [0, config.prices[config.prices.length - 1]],
+        sorting: null,
       },
       // inspect
     }

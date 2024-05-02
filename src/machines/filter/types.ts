@@ -5,7 +5,7 @@ export type Filter = {
   colors: Config['colors'][]
   sizes: Config['sizes'][]
   price: [number, number]
-  sorting: Config['sorting'] | undefined
+  sorting: Config['sorting'] | null
 }
 
 type FilterFields = keyof Filter
