@@ -3,7 +3,7 @@ import { FilterMachine_Context as Context } from '@/machines/filter/context'
 import { FilterMachine_Events as Events } from '@/machines/filter/events'
 import { FilterMachine_Input as Input } from '@/machines/filter/input'
 import { FilterChange_Event, FilterValue } from '@/machines/filter/types'
-import { assign, setup } from 'xstate'
+import { assign, setup, stateIn } from 'xstate'
 
 export const filterMachine = setup({
   types: {
@@ -20,7 +20,7 @@ export const filterMachine = setup({
 
         case 'type':
           return { type: value as FilterValue<'type'> }
-        
+
         case 'sorting':
           return { sorting: value as FilterValue<'sorting'> }
 
@@ -43,33 +43,27 @@ export const filterMachine = setup({
   },
   actors: {} as Actors,
 }).createMachine({
-  /** @xstate-layout N4IgpgJg5mDOIC5QDMCWAbALmATgWQEMBjAC1QDswBidAewIgqgDocxMcBPAbQAYBdRKAAOtWKkypa5ISAAeiAEwAWRc2XLeADlUBmRQE5FirYoCsAGhCdEAWgCMWgGzMz2xU95OtAdj-KDZQBfIKs0LFxCUgpqcOwcZlICchg+QSQQUXFJaVkFBFtA5gN7Xl0DT3sze3NdKxsCxV4DZkVdZVNnfV5DAx8QsIx4qLJKZjoGJgAFHFoIAFciTFgaekYU5lhFojhYNNksiSkZDPyHbVanewreL3sq3TMnesR7XXtmJx9eH31DDvMTjMAxAcUixFGYHGa2mswWSxWE3WLFwsxw+wyhxyJ1A+RUaiaTmUTneWlK3kUPheCDeHy+Pz+gVMT10ILB+AhMWYEDAACNaPNyEQmAAlMBIqhyWCYAjYZgEZDxAAUbl4AEoqOyRlyefzBcKUmKkRiRGIjrlTogvsxdLovk4DGYzPojLbqbZlB8yd8tG52oZ3sEQeQ5nBZFrOZQDmbsXk7FUXB5rp47g8nu72h82h1bYGtFpdD4nGyhuDomNYCRaAB3GZzRbLaPZY5xgoGFoaQI+ZRF241AzUpotJ5PAy8e7OZxGEsRDnlqGVmsAURwaKb5px8iUzs+vA6vqcTmMlJMg+ariBDvHjm8DsUM+GkahSNh9YR69jloQR9czh81V+MxlDtVRqUPZgfECfQe2JT1THsB8y0hbk+QFIVRXFNYPxbL8gOYCdx2UMwKnzIkgPdUoPg6ICex8AsdBUVkQiCIA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QDMCWAbALmATgWQEMBjAC1QDswBidAewIgqgDocxMcBPAbQAYBdRKAAOtWKkypa5ISAAeiALQAOZQBoQnJauYBWAL76NaLLkKkK1E9hzNSBcjD6CkIUeMnTZChIoDMGlq+AIzKwcwA7ABMAGy6MVEGRiDWZsRklDT0jI7MsACuRERwsM6y7hJSMq4+UYmRfgAsfhG6gUrBURF6jTHKAJy8icoRA7wxhsYYNuYZ1HQMTMy4OLQ4Za4VntWgPsGNEe0hrcy8Z7zBusOjgxPJqfjplswQYABGtPnkREwASmALCBUOSwTAEbDMAjIGwACkSvAAlFQHrNnq8Pl8fo5-oCNiIxJUvDUlE1ImMEm1NIhGuFgoNlI1lFF9lFlLpooZkuRaK94K4UU9KOUCdtvB0-DEjv5gn5IrF4olJilpmkLJQ8iRaAB3AAKqwghUwfPxHiqYoQUVJul6Y2u5KO4Uauj8wV4-QiNOZbpaSSmpkearAGu1AFEcKscMLTUTdohLspmH5+gyrq0Rvaqb4YrwlQLA8xAUw9TzDca3CKzcTfBF+om-Lp+qndOnbg7eN0DnEKbmVQG5i93p9vn8Adko4SdvIlDFGomGz6pXVTpbmq1OfogA */
   id: 'filterMachine',
 
   description: 'A state machine to manage the filtering of products',
   context: ({ input: filter }) => filter,
-  initial: 'loadingProducts',
 
   states: {
     showProducts: {},
     showError: {},
 
     loadingProducts: {
-      on: {
-        'loading.success': 'showProducts',
-        'loading.error': 'showError',
-      },
+      entry: ['reloadProducts']
     },
 
     debouncingReload: {
       after: {
-        '1000': {
-          target: 'loadingProducts',
-          actions: 'reloadProducts',
-        },
-      },
-    },
+        "250": "loadingProducts"
+      }
+    }
   },
+
   on: {
     'loading.retry': {
       target: '.debouncingReload',
@@ -84,5 +78,9 @@ export const filterMachine = setup({
         },
       ],
     },
+    'loading.success': '.showProducts',
+    "loading.error": ".showError"
   },
+
+  initial: 'loadingProducts',
 })

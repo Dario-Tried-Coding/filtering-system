@@ -35,9 +35,9 @@ export default function Home() {
         </DropdownMenu>
       </header>
       <div>{state.value}</div>
+      <button onClick={() => send({ type: 'filter.change', field: 'colors', value: 'BLUE' })}>click</button>
       <pre>{JSON.stringify(state.context, null, 2)}</pre>
       {error && <div className='text-red-500'>Errore: {error.message}</div>}
-      <button onClick={() => send({ type: 'filter.change', field: 'colors', value: 'BLUE' })}>click</button>
     </main>
   )
 }

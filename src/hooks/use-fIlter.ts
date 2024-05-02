@@ -28,6 +28,7 @@ export function useFilter() {
         price: [config.prices[0], config.prices[config.prices.length - 1]],
         sorting: undefined,
       },
+      // inspect
     }
   )
 
@@ -41,8 +42,8 @@ export function useFilter() {
     },
   })
 
-  useEffect(() => machine[1]({ type: 'loading.success' }), [query.dataUpdatedAt])
-  useEffect(() => machine[1]({ type: 'loading.error' }), [query.errorUpdatedAt])
+  useEffect(() => query.dataUpdatedAt ? machine[1]({ type: 'loading.success' }) : undefined, [query.dataUpdatedAt])
+  useEffect(() => query.errorUpdatedAt ? machine[1]({ type: 'loading.error' }) : undefined, [query.errorUpdatedAt])
 
   const debouncedSend = useDebouncedCallback((event: FilterMachine_Events) => machine[1](event), 500)
 

@@ -1,7 +1,7 @@
 'use client'
 
-import { FC, PropsWithChildren } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { FC, PropsWithChildren } from 'react'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 interface ProvidersProps extends PropsWithChildren {}
