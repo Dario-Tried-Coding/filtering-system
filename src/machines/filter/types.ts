@@ -4,7 +4,7 @@ export type Filter = {
   type: Config['types']
   colors: Config['colors'][]
   sizes: Config['sizes'][]
-  price: [number, number]
+  price: [number, number, { isCustom: boolean; customRange: [number, number] }]
   sorting: Config['sorting'] | null
 }
 

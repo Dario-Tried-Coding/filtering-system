@@ -7,12 +7,12 @@ import { useFilter } from '@/hooks/use-fIlter'
 import { cn } from '@/lib/utils'
 import { ChevronDown } from 'lucide-react'
 import { isEqual } from 'lodash'
+import { Slider } from '@/components/ui/Slider'
 
 export default function Home() {
   const {
     query: { error },
     machine: [state, send],
-    debouncedSend,
   } = useFilter()
 
   return (
@@ -135,9 +135,9 @@ export default function Home() {
                       id={`price-${opt.value[0]}-${opt.value[1]}`}
                       name='price'
                       onChange={() => {
-                        send({ type: 'filter.change', field: 'price', value: opt.value })
+                        send({ type: 'filter.change', field: 'price', value: [...opt.value, { ...state.context.price[2], isCustom: false }] })
                       }}
-                      checked={isEqual(state.context.price, opt.value)}
+                      checked={isEqual(state.context.price.slice(0, 2), opt.value) && !state.context.price[2]?.isCustom}
                       className='h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500'
                     />
                     <label htmlFor={`price-${opt.value[0]}-${opt.value[1]}`} className='ml-3 text-sm text-slate-600'>
@@ -145,6 +145,45 @@ export default function Home() {
                     </label>
                   </li>
                 ))}
+                <li className='flex flex-col justify-center gap-2'>
+                  <div>
+                    <input
+                      type='radio'
+                      id={`price-custom`}
+                      onChange={() => {
+                        send({ type: 'filter.change', field: 'price', value: [...state.context.price[2].customRange, { ...state.context.price[2], isCustom: true }] })
+                      }}
+                      checked={state.context.price[2]?.isCustom}
+                      className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
+                    />
+                    <label htmlFor={`price-custom`} className='ml-3 text-sm text-gray-600'>
+                      Personalizzato
+                    </label>
+                  </div>
+                  <div className='flex justify-between'>
+                    <p className='font-medium'>Prezzo</p>
+                    <div>
+                      {state.context.price[0].toFixed(0)} € - {state.context.price[1].toFixed(0)} €
+                    </div>
+                  </div>
+                  <Slider
+                    className={cn({
+                      'opacity-50': !state.context.price[2]?.isCustom,
+                    })}
+                    disabled={!state.context.price[2]?.isCustom}
+                    onValueChange={(range) =>
+                      send({
+                        type: 'filter.change',
+                        field: 'price',
+                        value: [...(range as [number, number]), { isCustom: true, customRange: range as [number, number] }],
+                      })
+                    }
+                    value={state.context.price[2].customRange}
+                    min={0}
+                    max={100}
+                    step={5}
+                  />
+                </li>
               </ul>
             </AccordionContent>
           </AccordionItem>

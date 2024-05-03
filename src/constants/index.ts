@@ -1,4 +1,4 @@
-import { Config, config } from '@/config'
+import { Config } from '@/config';
 
 export const sortingOptions: { value: Config['sorting']; label: string }[] = [
   { value: 'PRICE_ASC', label: 'Prezzo: Basso ad Alto' },
@@ -25,7 +25,7 @@ export const typeOptions: { value: Config['types']; label: string; disabled?: bo
 ]
 
 export const priceOptions: { value: [number, number]; label: string }[] = [
-  { value: [0, config.prices[config.prices.length -1]], label: 'Tutti i prezzi' },
+  { value: [0, 100], label: 'Tutti i prezzi' },
   { value: [0, 20], label: 'Sotto i 20€' },
   { value: [0, 40], label: 'Sotto i 40€' },
 ]

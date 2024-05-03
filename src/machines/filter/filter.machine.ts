@@ -12,11 +12,10 @@ export const filterMachine = setup({
     events: {} as Events,
   },
   actions: {
-    reloadProducts: () => {},
     updateFilter: assign(({ context: filter }, { field, value }: Omit<FilterChange_Event, 'type'>) => {
       switch (field) {
         case 'price':
-          return { price: value as [number, number] }
+          return { price: value as FilterValue<'price'> }
 
         case 'type':
           return { type: value as FilterValue<'type'> }
@@ -43,7 +42,7 @@ export const filterMachine = setup({
   },
   actors: {} as Actors,
 }).createMachine({
-  /** @xstate-layout N4IgpgJg5mDOIC5QDMCWAbALmATgWQEMBjAC1QDswBidAewIgqgDocxMcBPAbQAYBdRKAAOtWKkypa5ISAAeiALQAOZQBoQnJauYBWAL76NaLLkKkK1E9hzNSBcjD6CkIUeMnTZChIoDMGlq+AIzKwcwA7ABMAGy6MVEGRiDWZsRklDT0jI7MsACuRERwsM6y7hJSMq4+UVEALJF+9X4RuoFK9VF69THKAJy8icoRA7wxhsYYNuYZ1HQMTMy4OLQ4Za4VntWgPsG9Hb6DzLynvMG6w6ODE8mp+OmWzBBgAEa0+eRETABKYAsQKhyWCYAjYZgEZA2AAUiV4AEoqPdZk8Xu9Pt9HH8ARsRGJKl4akpmpExgl2ppEPVwsFBsp6soovsospdNFDMlyLQXvBXMjHpRyvjtt4lME-DFDv5xZFYvFEpMUtM0hZKHkSLQAO4ABVWEEKmF5eI8VVFCCifj8PT6gyuZMOyhizHquj8wV4-Qi1KZHvqiv5qrA6q1AFEcKscEKTYTdogLhFmH5+vTLm0RvbKeaklNTA9A8wAUxddyDUa3MLTUTfBF+om-Lp+qndOmbod3Qn6hE4uT-cq83Nnm8Pl9fv9slGCTt5EoYo16-1WhSgoo6icLS02hz9EA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QDMCWAbALmATgWQEMBjAC1QDswBidAewIgqgDocxMcBPAbQAYBdRKAAOtWKkypa5ISAAeiALQAOAMzMATGoCcqtQBYNqgOxqNAGhCcl2-c1XaArL2PGXG3huMBGAL6-LNCxcQlIKaiDsHGZSAnIYPkEkEFFxSWlZBQRvZh8ANl487zzHYzyNYuNtPMtrBEVvZWNmcuKHUo8vPwCQSJDiMkpmOgYmAAUcWggAVyJMWCoIaTBmCgA3WgBrFb78AfDh+kZ4ianZ+YR12iICdPJExNlUiSkZZKyGjUcW7V5G1VUjm0Rk8FisiAqGmYvEcyl4qg0eTy2n+an8gQwUVCgxWI2OUFOMzmC1wk2iwnQt2QtBwAFtmLtsQc8eNJkSLlcbncHgInmIXhl3og8sxvI5VGLjICqo5vI1jLUIaVoU4XMoURp9Lw-ujepj+mEhhAwAAjWjTchEJgAJTAeKoclgmFuKwIyCiAAovrwAJRURn7I2m82Wm12o6PZLPO6ZJSqXjQqXa3jKQwmMyKhCAzROVxywxfZRFPL+HrkKZwWQBw1gPlpV6x+reKU-P5qQHA+MaMF1RQS7QtCp5fSp-T6XRaXXVnHMWAkWgAd0J53gUf5MaFTblzG0PjHQJ8ri0jkzEuajlh8MRyNRqin+r2Ndn84XAFEcGS6wK3qAsqo7DCYraMocI+N4KbeKezbMBecIIkiKJqGiPTTsyRysmcxJfhuv5KMYdhFMBKLgXKeRSsomYkTByjeCOjiGFUxgaNo97BI+M7GmaFpWvEtp4thDabooQItPoALeACaamAimaKF4O6NLK+gdJ4PguKWvhAA */
   id: 'filterMachine',
 
   description: 'A state machine to manage the filtering of products',
@@ -54,7 +53,11 @@ export const filterMachine = setup({
     showError: {},
 
     loadingProducts: {
-      entry: ['reloadProducts']
+      invoke: {
+        src: 'loadProducts',
+        onDone: 'showProducts',
+        onError: 'showError',
+      }
     },
 
     debouncingReload: {
@@ -77,9 +80,7 @@ export const filterMachine = setup({
           params: ({ event: { field, value } }) => ({ field, value }),
         },
       ],
-    },
-    'loading.success': '.showProducts',
-    "loading.error": ".showError"
+    }
   },
 
   initial: 'loadingProducts',
