@@ -8,6 +8,7 @@ import axios from 'axios'
 import { useCallback, useEffect, useReducer } from 'react'
 import { useDebouncedCallback, useDebouncedState, useDebouncedValue } from '@mantine/hooks'
 import { stringifyFilter } from '@/utils'
+import { FilterPayload } from '@/lib/validators/filter'
 
 const reducer = (state: Filter, payload: FilterChange_Payloads): Filter => {
   switch (payload.field) {
@@ -42,9 +43,17 @@ export function useFilter() {
   const debouncedFilter = useDebouncedValue(filterReducer[0], 300)
 
   const query = useQuery({
-    queryKey: ['products', stringifyFilter(filterReducer[0].price.isCustom ? debouncedFilter : filterReducer[0])],
-    queryFn: async () => {
-      const { data } = await axios.post<Product[]>('/api/products')
+    queryKey: ['products', filterReducer[0].price.isCustom ? debouncedFilter[0] : filterReducer[0]],
+    queryFn: async ({ queryKey }) => {
+      const payload: FilterPayload = {
+        clothing: (queryKey[1] as Filter).clothing,
+        color: (queryKey[1] as Filter).colors,
+        size: (queryKey[1] as Filter).sizes,
+        price: (queryKey[1] as Filter).price.range,
+        sorting: (queryKey[1] as Filter).sorting,
+      }
+
+      const { data } = await axios.post<Product[]>('/api/products', payload)
       return data
     },
   })

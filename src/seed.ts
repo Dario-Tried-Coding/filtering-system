@@ -1,10 +1,10 @@
-import { CLOTHING_TYPES, COLORS, PRICES, SIZES } from '@/config'
+import { config } from '@/config'
 import { PrismaClient, Product } from '@prisma/client'
 import { nanoid } from 'nanoid'
 
 const db = new PrismaClient()
 
-const generateRandomPrice = () => PRICES[Math.floor(Math.random() * PRICES.length)]
+const generateRandomPrice = () => config.prices[Math.floor(Math.random() * config.prices.length)]
 
 async function seed() {
   console.log('[INFO]: Seeding process started...')
@@ -16,12 +16,12 @@ async function seed() {
 
     console.log('[INFO]: db reset completed!')
 
-    for (let typeIdx = 0; typeIdx < CLOTHING_TYPES.length; typeIdx++) {
-      for (let colorIdx = 0; colorIdx < COLORS.length; colorIdx++) {
-        for (let sizeIdx = 0; sizeIdx < SIZES.length; sizeIdx++) {
-          const type = CLOTHING_TYPES[typeIdx]
-          const color = COLORS[colorIdx]
-          const size = SIZES[sizeIdx]
+    for (let typeIdx = 0; typeIdx < config.clothings.length; typeIdx++) {
+      for (let colorIdx = 0; colorIdx < config.colors.length; colorIdx++) {
+        for (let sizeIdx = 0; sizeIdx < config.sizes.length; sizeIdx++) {
+          const type = config.clothings[typeIdx]
+          const color = config.colors[colorIdx]
+          const size = config.sizes[sizeIdx]
 
           products.push({
             id: nanoid(),

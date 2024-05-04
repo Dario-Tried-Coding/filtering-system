@@ -23,6 +23,7 @@ enum COLOR {
 
 enum CLOTHING_TYPE {
   SHIRT
+  JEANS
 }
 
 model Product {

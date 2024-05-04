@@ -1,10 +1,11 @@
-import { CLOTHING_TYPES as TYPES, COLORS, SIZES } from '@/config'
+import { config } from '@/config'
 import { z } from 'zod'
 
 export const filterValidator = z.object({
-  type: z.enum(TYPES),
-  color: z.array(z.enum(COLORS)),
-  size: z.array(z.enum(SIZES)),
-  price: z.tuple([z.number(), z.number()])
+  clothing: z.enum(config.clothings),
+  color: z.array(z.enum(config.colors)),
+  size: z.array(z.enum(config.sizes)),
+  price: z.tuple([z.number(), z.number()]),
+  sorting: z.nullable(z.enum(config.sorting))
 })
 export type FilterPayload = z.infer<typeof filterValidator>

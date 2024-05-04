@@ -1,5 +1,8 @@
 'use client'
 
+import EmptyState from '@/components/products/EmptyState'
+import Product from '@/components/products/Product'
+import ProductSkeleton from '@/components/products/ProductSkeleton'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/DropdownMenu'
 import { Slider } from '@/components/ui/Slider'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
@@ -11,7 +14,7 @@ import { ChevronDown } from 'lucide-react'
 
 export default function Home() {
   const {
-    query: { error },
+    query: { data: products },
     filterReducer: [filter, send],
   } = useFilter()
 
@@ -126,7 +129,7 @@ export default function Home() {
               <ul className='space-y-4'>
                 {PRICE_OPTIONS.options.map((opt) =>
                   opt.value === 'custom' ? (
-                    <li key={`${PRICE_OPTIONS.id}-${opt.value}`}  className='flex flex-col justify-center gap-2'>
+                    <li key={`${PRICE_OPTIONS.id}-${opt.value}`} className='flex flex-col justify-center gap-2'>
                       <div>
                         <input
                           type='radio'
@@ -186,9 +189,15 @@ export default function Home() {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-        <div>
-          <pre>{JSON.stringify(filter, null, 2)}</pre>
-        </div>
+        <ul className='grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3 lg:col-span-3'>
+          {products && products.length === 0 ? (
+            <EmptyState />
+          ) : products ? (
+            products.map((p) => <Product key={p.id} product={p} />)
+          ) : (
+            new Array(12).fill(null).map((_, i) => <ProductSkeleton key={i} />)
+          )}
+        </ul>
       </section>
     </main>
   )
