@@ -1,31 +1,63 @@
-import { Config } from '@/config';
+import { Filter, FilterFields } from '@/types'
 
-export const sortingOptions: { value: Config['sorting']; label: string }[] = [
-  { value: 'PRICE_ASC', label: 'Prezzo: Basso ad Alto' },
-  { value: 'PRICE_DESC', label: 'Prezzo: Alto a Basso' },
-]
+type FilterOptions<Field extends FilterFields> = {
+  id: Field
+  name: string
+  options: {
+    value: Field extends 'price' ? [number, number] | 'custom' : Filter[Field] extends string[] ? Filter[Field][number] : Filter[Field]
+    label: string
+    disabled?: boolean
+  }[]
+}
 
-export const colorOptions: { value: Config['colors']; label: string }[] = [
-  { value: 'WHITE', label: 'Bianco' },
-  { value: 'BEIGE', label: 'Beige' },
-  { value: 'BLUE', label: 'Blu' },
-  { value: 'GREEN', label: 'Verde' },
-  { value: 'PURPLE', label: 'Viola' },
-]
+export const SORTING_OPTIONS: FilterOptions<'sorting'> = {
+  id: 'sorting',
+  name: 'Ordina',
+  options: [
+    { value: null, label: 'Nessuno' },
+    { value: 'PRICE_ASC', label: 'Prezzo: Basso ad Alto' },
+    { value: 'PRICE_DESC', label: 'Prezzo: Alto a Basso' },
+  ],
+} as const
 
-export const sizeOptions: { value: Config['sizes']; label: string }[] = [
-  { value: 'S', label: 'S (small)' },
-  { value: 'M', label: 'M (medium)' },
-  { value: 'L', label: 'L (large)' },
-]
+export const COLOR_OPTIONS: FilterOptions<'colors'> = {
+  id: 'colors',
+  name: 'Colore',
+  options: [
+    { value: 'WHITE', label: 'Bianco' },
+    { value: 'BEIGE', label: 'Beige' },
+    { value: 'BLUE', label: 'Blu' },
+    { value: 'GREEN', label: 'Verde' },
+    { value: 'PURPLE', label: 'Viola' },
+  ],
+} as const
 
-export const typeOptions: { value: Config['types']; label: string; disabled?: boolean }[] = [
-  { value: 'SHIRT', label: 'Camicia' },
-  { value: 'JEANS', label: 'Jeans', disabled: true },
-]
+export const SIZE_OPTIONS: FilterOptions<'sizes'> = {
+  id: 'sizes',
+  name: 'Taglia',
+  options: [
+    { value: 'S', label: 'S (small)' },
+    { value: 'M', label: 'M (medium)' },
+    { value: 'L', label: 'L (large)' },
+  ],
+} as const
 
-export const priceOptions: { value: [number, number]; label: string }[] = [
-  { value: [0, 100], label: 'Tutti i prezzi' },
-  { value: [0, 20], label: 'Sotto i 20€' },
-  { value: [0, 40], label: 'Sotto i 40€' },
-]
+export const CLOTHING_OPTIONS: FilterOptions<'clothing'> = {
+  id: 'clothing',
+  name: 'Indumento',
+  options: [
+    { value: 'SHIRT', label: 'Camicia' },
+    { value: 'JEANS', label: 'Jeans', disabled: true },
+  ],
+} as const
+
+export const PRICE_OPTIONS: FilterOptions<'price'> = {
+  id: 'price',
+  name: 'Prezzo',
+  options: [
+    { value: [0, 100], label: 'Tutti i prezzi' },
+    { value: [0, 20], label: 'Sotto i 20€' },
+    { value: [0, 40], label: 'Sotto i 40€' },
+    { value: 'custom', label: 'Personalizzato' },
+  ],
+} as const

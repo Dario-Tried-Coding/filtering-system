@@ -1,13 +1,13 @@
 import { config } from "@/config"
-import { Filter } from "@/machines/filter/types"
+import { Filter } from "@/types"
 
 type FilterMap = { [key in keyof Filter]: number }
 type ColorsMap = { [key in Filter['colors'][number]]: number }
 type SizesMap = { [key in Filter['sizes'][number]]: number }
-type CustomPriceRangeMap = { [key in keyof Filter['price'][2]]: number }
+type CustomPriceRangeMap = { [key in keyof Filter['price']]: number }
 
 const filterMap: FilterMap = {
-  type: 0,
+  clothing: 0,
   colors: 1,
   sizes: 2,
   price: 3,
@@ -26,8 +26,9 @@ const sizesMap: SizesMap = {
   L: 2,
 }
 const customPriceRangeMap: CustomPriceRangeMap = {
-  customRange: 0,
-  isCustom: 1,
+  range: 0,
+  customRange: 1,
+  isCustom: 2,
 }
 
 export function stringifyFilter(obj: Filter | any): string {

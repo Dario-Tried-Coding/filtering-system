@@ -1,54 +1,53 @@
 'use client'
 
-import { filterMachine } from '@/machines/filter/filter.machine'
-import { Product } from '@prisma/client'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useMachine } from '@xstate/react'
-import axios from 'axios'
-import { useEffect } from 'react'
 import { config } from '@/config'
-import { FilterMachine_Events } from '@/machines/filter/events'
-import { useDebouncedCallback } from '@mantine/hooks'
-import { fromPromise } from 'xstate'
+import { Filter, FilterChange_Payloads } from '@/types'
+import { Product } from '@prisma/client'
+import { useQuery } from '@tanstack/react-query'
+import axios from 'axios'
+import { useCallback, useEffect, useReducer } from 'react'
+import { useDebouncedCallback, useDebouncedState, useDebouncedValue } from '@mantine/hooks'
+import { stringifyFilter } from '@/utils'
 
-// import { createBrowserInspector } from '@statelyai/inspect'
-// const { inspect } = createBrowserInspector()
+const reducer = (state: Filter, payload: FilterChange_Payloads): Filter => {
+  switch (payload.field) {
+    case 'clothing':
+      return { ...state, clothing: payload.value }
+    case 'sorting':
+      return { ...state, sorting: payload.value }
+    case 'price':
+      return { ...state, price: payload.value }
+    case 'colors':
+      const updatedColor = state.colors.includes(payload.value) ? state.colors.filter((c) => c !== payload.value) : [...state.colors, payload.value]
+      return { ...state, colors: updatedColor }
+    case 'sizes':
+      const updatedSize = state.sizes.includes(payload.value) ? state.sizes.filter((s) => s !== payload.value) : [...state.sizes, payload.value]
+      return { ...state, sizes: updatedSize }
+  }
+}
 
 export function useFilter() {
-  const machine = useMachine(
-    filterMachine.provide({
-      actors: {
-        loadProducts: fromPromise(async () => {
-          await queryClient.invalidateQueries({ queryKey: ['products'] })
-        }),
-      },
-    }),
+  const filterReducer = useReducer<(state: Filter, action: FilterChange_Payloads) => Filter, Filter>(
+    reducer,
     {
-      input: {
-        type: config.types[0],
-        colors: config.colors.map((c) => c),
-        sizes: config.sizes.map((s) => s),
-        price: [0, 100, { isCustom: false, customRange: [0, 100] }],
-        sorting: null,
-      },
-      // inspect
-    }
+      clothing: config.clothings[0],
+      colors: [...config.colors],
+      sizes: [...config.sizes],
+      price: { range: [0, 100], customRange: [0, 100], isCustom: false },
+      sorting: null,
+    },
+    (filter) => filter
   )
 
+  const debouncedFilter = useDebouncedValue(filterReducer[0], 300)
+
   const query = useQuery({
-    queryKey: ['products'],
+    queryKey: ['products', stringifyFilter(filterReducer[0].price.isCustom ? debouncedFilter : filterReducer[0])],
     queryFn: async () => {
       const { data } = await axios.post<Product[]>('/api/products')
       return data
     },
   })
 
-  const queryClient = useQueryClient()
-
-  useEffect(() => (query.dataUpdatedAt ? machine[1]({ type: 'loading.success' }) : undefined), [query.dataUpdatedAt])
-  useEffect(() => (query.errorUpdatedAt ? machine[1]({ type: 'loading.error' }) : undefined), [query.errorUpdatedAt])
-
-  const debouncedSend = useDebouncedCallback((event: FilterMachine_Events) => machine[1](event), 400)
-
-  return { query, machine, debouncedSend }
+  return { query, filterReducer }
 }

@@ -1,5 +1,5 @@
 export const config = {
-  types: ['SHIRT', 'JEANS'],
+  clothings: ['SHIRT', 'JEANS'],
   colors: ['WHITE', 'BEIGE', 'BLUE', 'GREEN', 'PURPLE'],
   sizes: ['S', 'M', 'L'],
   prices: [9.99, 19.99, 29.99, 39.99, 49.99, 59.99],
