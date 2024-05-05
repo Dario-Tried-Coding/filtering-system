@@ -1,6 +1,6 @@
-import { db } from "@/lib/prisma";
-import { filterValidator } from "@/lib/validators/filter";
-import { ZodError } from "zod";
+import { db } from '@/lib/prisma'
+import { filterValidator } from '@/lib/validators/filter'
+import { ZodError } from 'zod'
 
 export async function POST(req: Request) {
   try {
@@ -12,8 +12,9 @@ export async function POST(req: Request) {
         type: filter.clothing,
         color: { in: filter.color },
         size: { in: filter.size },
-        price: { gte: filter.price[0], lte: filter.price[1] }
-      }
+        price: { gte: filter.price[0], lte: filter.price[1] },
+      },
+      orderBy: filter.sorting ? { price: filter.sorting === 'PRICE_ASC' ? 'asc' : 'desc' } : {},
     })
 
     return new Response(JSON.stringify(products))
