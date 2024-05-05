@@ -1,14 +1,13 @@
 'use client'
 
 import { config } from '@/config'
+import { FilterPayload } from '@/lib/validators/filter'
 import { Filter, FilterChange_Payloads } from '@/types'
+import { useDebouncedValue } from '@mantine/hooks'
 import { Product } from '@prisma/client'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
-import { useCallback, useEffect, useReducer } from 'react'
-import { useDebouncedCallback, useDebouncedState, useDebouncedValue } from '@mantine/hooks'
-import { stringifyFilter } from '@/utils'
-import { FilterPayload } from '@/lib/validators/filter'
+import { useReducer } from 'react'
 
 const reducer = (state: Filter, payload: FilterChange_Payloads): Filter => {
   switch (payload.field) {
@@ -40,17 +39,17 @@ export function useFilter() {
     (filter) => filter
   )
 
-  const debouncedFilter = useDebouncedValue(filterReducer[0], 300)
+  const [{ clothing, colors, price, sizes, sorting }] = useDebouncedValue(filterReducer[0], 300, { leading: true })
 
   const query = useQuery({
-    queryKey: ['products', filterReducer[0].price.isCustom ? debouncedFilter[0] : filterReducer[0]],
+    queryKey: ['products', clothing, colors, sizes, price.range, sorting],
     queryFn: async ({ queryKey }) => {
       const payload: FilterPayload = {
-        clothing: (queryKey[1] as Filter).clothing,
-        color: (queryKey[1] as Filter).colors,
-        size: (queryKey[1] as Filter).sizes,
-        price: (queryKey[1] as Filter).price.range,
-        sorting: (queryKey[1] as Filter).sorting,
+        clothing: queryKey[1] as Filter['clothing'],
+        color: queryKey[2] as Filter['colors'],
+        size: queryKey[3] as Filter['sizes'],
+        price: queryKey[4] as Filter['price']['range'],
+        sorting: queryKey[5] as Filter['sorting'],
       }
 
       const { data } = await axios.post<Product[]>('/api/products', payload)
